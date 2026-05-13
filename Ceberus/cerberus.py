@@ -4,7 +4,7 @@ from rocketpy import Environment, SolidMotor, Rocket, Flight, Parachute, NoseCon
 
 import datetime, math, matplotlib.pyplot as plt, rocketpy.tools as tls, numpy as np
 
-curves_dir = "C:\\Users\\Owner\\Desktop\\Rockets\\cerberus\\RocketPy\\curves\\"
+curves_dir = "C:\\Users\\Owner\\Desktop\\Rockets\\Rocketry Repo\\Cerberus\\curves\\"
 sustainer_thrust = curves_dir + "thrust two.rse"
 sustainer_drag = curves_dir + "drag two.csv"
 booster_thrust = curves_dir + "thrust one.rse"
