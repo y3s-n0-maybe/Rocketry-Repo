@@ -1,14 +1,14 @@
-# For most up to date code: check github https://www.github.com/y3s-n0-maybe/cerberus
+# For most up to date code: check github https://www.github.com/y3s-n0-maybe/rocketry-repo
 
 from rocketpy import Environment, SolidMotor, Rocket, Flight, Parachute, NoseCone, TrapezoidalFins, RailButtons, Function, Tail
 
-import datetime, math, matplotlib.pyplot as plt, rocketpy.tools as tls, numpy as np
+import datetime, math, matplotlib.pyplot as plt, rocketpy.tools as tls
 
 curves_dir = "C:\\Users\\Owner\\Desktop\\Rockets\\Rocketry Repo\\Cerberus\\curves\\"
-sustainer_thrust = curves_dir + "thrust two.rse"
-sustainer_drag = curves_dir + "drag two.csv"
-booster_thrust = curves_dir + "thrust one.rse"
-booster_drag = curves_dir + "drag one.csv"
+sustainer_thrust = curves_dir + "cerberus-sustainer-thrust.rse"
+sustainer_drag = curves_dir + "cerberus-sustainer-drag.csv"
+booster_thrust = curves_dir + "cerberus-booster-thrust.rse"
+booster_drag = curves_dir + "cerberus-booster-drag.csv"
 
 booster_burnout = 1.7
 sustainer_delay = 2

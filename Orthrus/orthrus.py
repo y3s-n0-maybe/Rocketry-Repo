@@ -2,13 +2,13 @@
 
 from rocketpy import Environment, SolidMotor, Rocket, Flight, Parachute, NoseCone, TrapezoidalFins, RailButtons, Function, Tail
 
-import datetime, math, matplotlib.pyplot as plt, rocketpy.tools as tls, numpy as np
+import datetime, math, matplotlib.pyplot as plt, rocketpy.tools as tls
 
 curves_dir = "C:\\Users\\Owner\\Desktop\\Rockets\\Rocketry Repo\\Orthrus\\Curves\\"
-sustainer_thrust = curves_dir + "sustainer-thrust.rse"
-sustainer_drag = curves_dir + "sustainer-drag.csv"
-booster_thrust = curves_dir + "booster-thrust.rse"
-booster_drag = curves_dir + "booster-drag.csv"
+sustainer_thrust = curves_dir + "orthrus-sustainer-thrust.rse"
+sustainer_drag = curves_dir + "orthrus-sustainer-drag.csv"
+booster_thrust = curves_dir + "orthrus-booster-thrust.rse"
+booster_drag = curves_dir + "orthrus-booster-drag.csv"
 
 booster_burnout = 2.36
 sustainer_delay = 2
