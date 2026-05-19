@@ -13,8 +13,8 @@ booster_drag = curves_dir + "orpheus-booster-drag.csv"
 booster_burnout = 2.67
 sustainer_delay = .5
 
-sustainer_radius = 0.1/2
-booster_radius = 0.1/2
+sustainer_radius = 0.12/2
+booster_radius = 0.12/2
 
 total_length = 3.4
 sustainer_length = 2.3
@@ -22,20 +22,20 @@ nose_length = 0.5
 
 booster_motor_length = 0.5
 booster_motor_dry_mass = 1.4
-booster_motor_total_mass = 1.4 + 1.906
-booster_motor_giir = 0.01905
-booster_motor_or = 0.056/2
-booster_motor_grain_number = 5
+booster_motor_total_mass = 4
+booster_motor_giir = 0.03/2 
+booster_motor_or = 0.079/2
+booster_motor_grain_number = 4 
 booster_motor_grain_density = (booster_motor_total_mass - booster_motor_dry_mass) / ((booster_motor_length * math.pi * booster_motor_or**2) - (booster_motor_length * math.pi * booster_motor_giir**2))
 booster_xy_inertia = (1/12 * booster_motor_dry_mass * (3 * (booster_motor_or ** 2) + (booster_motor_length ** 2)))
 booster_tensor = [booster_xy_inertia, booster_xy_inertia, (.5 * booster_motor_dry_mass * booster_motor_or)]
 
-sustainer_motor_length = 0.5
-sustainer_motor_dry_mass = 1.4
-sustainer_motor_total_mass = 1.4 + 1.906
-sustainer_motor_giir = 0.01905
-sustainer_motor_or = 0.056/2
-sustainer_motor_grain_number = 5
+sustainer_motor_length = 0.4
+sustainer_motor_dry_mass = 1.2
+sustainer_motor_total_mass = 3.4
+sustainer_motor_giir = 0.03/2
+sustainer_motor_or = 0.07/2
+sustainer_motor_grain_number = 4
 sustainer_motor_grain_density = (sustainer_motor_total_mass - sustainer_motor_dry_mass) / ((sustainer_motor_length * math.pi * sustainer_motor_or**2) - (sustainer_motor_length * math.pi * sustainer_motor_giir**2))
 sustainer_xy_inertia = (1/12 * sustainer_motor_dry_mass * (3 * (sustainer_motor_or ** 2) + (sustainer_motor_length ** 2)))
 sustainer_tensor = [sustainer_xy_inertia, sustainer_xy_inertia, (.5 * sustainer_motor_dry_mass * sustainer_motor_or)]
@@ -45,7 +45,7 @@ varDate = datetime.datetime(2026, 10, 1, hour = 12)
 env =  Environment(latitude = 55.435108, longitude = -5.691520, date = varDate)
 #env.set_atmospheric_model(type = "Windy", file = "ICON") 
 
-env.set_atmospheric_model(type="custom_atmosphere", pressure=None, temperature=300, wind_u=[ (15, 5), (1000, 5) ], wind_v=[ (15, 0), (1000, 0) ], )
+env.set_atmospheric_model(type="custom_atmosphere", pressure=None, temperature=300, wind_u=[ (0, 0), (1000, 0) ], wind_v=[ (15, 0), (1000, 0) ], )
 
 def kinematics(self, *, filename=None):  # pylint: disable=too-many-statements
     """Prints out all Kinematics graphs available about the Flight
@@ -332,7 +332,7 @@ booster_motor = SolidMotor(
     grain_outer_radius = booster_motor_or,
     grain_separation = 0,
     grains_center_of_mass_position = booster_motor_length / 2,
-    nozzle_radius = .012,
+    nozzle_radius = 0.0155/2, 
     thrust_source = booster_thrust
     )   
 
@@ -348,35 +348,35 @@ sustainer_motor = SolidMotor(
     grain_outer_radius = sustainer_motor_or,
     grain_separation = 0,
     grains_center_of_mass_position = sustainer_motor_length / 2,
-    nozzle_radius = 0.012,
+    nozzle_radius = 0.0155/2,
     thrust_source = sustainer_thrust
     )
 
 booster = Rocket(
-    center_of_mass_without_motor = total_length - 1.85,
+    center_of_mass_without_motor = total_length - 2.02,
     coordinate_system_orientation = "tail_to_nose",
     power_off_drag = booster_drag,
     power_on_drag = booster_drag,
-    inertia = [0.71, 0.71, 0.015],
-    mass = 7.95 + sustainer_motor_total_mass,
+    inertia = [0.71, 0.71, 0.015], # PLACEHOLDER
+    mass = 10.1 + sustainer_motor_total_mass,
     radius = booster_radius
 
 )
 
 sustainer = Rocket(
-    center_of_mass_without_motor = sustainer_length - 1.38,
+    center_of_mass_without_motor = sustainer_length - 1.24,
     coordinate_system_orientation = "tail_to_nose",
     power_off_drag = sustainer_drag,
     power_on_drag = sustainer_drag,
-    inertia = [1.75, 1.75, 0.01],
-    mass = 5.41,
+    inertia = [1.75, 1.75, 0.01], # PLACEHOLDER
+    mass = 5.61,
     radius = sustainer_radius
 )
 
 boattail = Tail(
     length = 0.05,
     top_radius =  booster_radius,
-    bottom_radius = 0.04,
+    bottom_radius = 0.081/2,
     rocket_radius = booster_radius,
     name = "Boattail"
 )
@@ -397,8 +397,8 @@ booster.add_trapezoidal_fins(
     cant_angle = 0.0,
     name = "Booster Fins",
     n = 4,
-    root_chord = 0.16,
-    span = 0.1,
+    root_chord = 0.15,
+    span = 0.11,
     sweep_length = 0.03,
     tip_chord = 0.14,
     position = .2
@@ -423,7 +423,7 @@ nose = NoseCone (
     name  =  "Nose Cone Two",
 )
 
-booster.add_surfaces([boattail, nose, sustainer_fins], [0, total_length, total_length - 1.99])
+booster.add_surfaces([boattail, nose, sustainer_fins], [0, total_length, total_length - 2.09])
 
 sustainer.add_parachute(
     name = "Sustainer Main", 
