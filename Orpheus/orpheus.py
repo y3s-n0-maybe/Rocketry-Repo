@@ -451,7 +451,7 @@ sustainer.add_surfaces([nose, sustainer_fins], [sustainer_length, (.05+0.16)])
 booster_flight = Flight(
     rocket = booster,
     environment = env,
-    rail_length = 2.0,
+    rail_length = 12.0,
     inclination = 90,
     heading = round(env.wind_direction(20)),
     
