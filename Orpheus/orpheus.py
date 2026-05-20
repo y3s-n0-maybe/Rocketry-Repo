@@ -16,13 +16,13 @@ sustainer_delay = .5
 sustainer_radius = 0.12/2
 booster_radius = 0.12/2
 
-total_length = 3.4
-sustainer_length = 2.3
-nose_length = 0.5
+total_length = 4
+sustainer_length = 2.65
+nose_length = 0.6
 
-booster_motor_length = 0.5
-booster_motor_dry_mass = 1.4
-booster_motor_total_mass = 4
+booster_motor_length = 0.505
+booster_motor_dry_mass = 1.382
+booster_motor_total_mass = 1.382 + 2.597
 booster_motor_giir = 0.03/2 
 booster_motor_or = 0.079/2
 booster_motor_grain_number = 4 
@@ -31,10 +31,10 @@ booster_xy_inertia = (1/12 * booster_motor_dry_mass * (3 * (booster_motor_or ** 
 booster_tensor = [booster_xy_inertia, booster_xy_inertia, (.5 * booster_motor_dry_mass * booster_motor_or)]
 
 sustainer_motor_length = 0.4
-sustainer_motor_dry_mass = 1.2
-sustainer_motor_total_mass = 3.4
+sustainer_motor_dry_mass = 1.382
+sustainer_motor_total_mass = 1.382 + 2.597
 sustainer_motor_giir = 0.03/2
-sustainer_motor_or = 0.07/2
+sustainer_motor_or = 0.079/2
 sustainer_motor_grain_number = 4
 sustainer_motor_grain_density = (sustainer_motor_total_mass - sustainer_motor_dry_mass) / ((sustainer_motor_length * math.pi * sustainer_motor_or**2) - (sustainer_motor_length * math.pi * sustainer_motor_giir**2))
 sustainer_xy_inertia = (1/12 * sustainer_motor_dry_mass * (3 * (sustainer_motor_or ** 2) + (sustainer_motor_length ** 2)))
@@ -42,10 +42,10 @@ sustainer_tensor = [sustainer_xy_inertia, sustainer_xy_inertia, (.5 * sustainer_
 
 varDate = datetime.datetime(2026, 10, 1, hour = 12)
 
-env =  Environment(latitude = 55.435108, longitude = -5.691520, date = varDate)
+env =  Environment(latitude = 39.4580, longitude = -8.2906, date = varDate)
 #env.set_atmospheric_model(type = "Windy", file = "ICON") 
 
-env.set_atmospheric_model(type="custom_atmosphere", pressure=None, temperature=300, wind_u=[ (0, 0), (1000, 0) ], wind_v=[ (15, 0), (1000, 0) ], )
+env.set_atmospheric_model(type="custom_atmosphere", pressure=None, temperature=300, wind_u=[ (0, 5), (1000, 5) ], wind_v=[ (15, 0), (1000, 0) ], )
 
 def kinematics(self, *, filename=None):  # pylint: disable=too-many-statements
     """Prints out all Kinematics graphs available about the Flight
@@ -129,7 +129,7 @@ def aerodynamics(self, *, filename=None):  # pylint: disable=too-many-statements
         self.aerodynamic_drag[: tls.find_closest(self.time_steps, self.apogee_time), 1],
     )
     ax2.set_xlim(0, self.apogee_time)
-    ax2.set_ylim(0, 75)
+    ax2.set_ylim(0)
     ax2.set_xlabel("Time (s)")
     ax2.set_ylabel("Drag Force (N)")
     ax2.set_title("Aerodynamic Drag Force")
@@ -320,6 +320,9 @@ def kinematics_plots():
     kinematics(booster_flight)
     kinematics(sustainer_flight)
 
+def cds_calc_circle(diameter):
+    return ((0.8 * (diameter/2) ** 2) * math.pi)
+
 booster_motor = SolidMotor(
     coordinate_system_orientation = "nozzle_to_combustion_chamber",
     center_of_dry_mass_position = booster_motor_length / 2,
@@ -353,23 +356,23 @@ sustainer_motor = SolidMotor(
     )
 
 booster = Rocket(
-    center_of_mass_without_motor = total_length - 2.02,
+    center_of_mass_without_motor = total_length - 2.27,
     coordinate_system_orientation = "tail_to_nose",
     power_off_drag = booster_drag,
     power_on_drag = booster_drag,
-    inertia = [0.71, 0.71, 0.015], # PLACEHOLDER
-    mass = 10.1 + sustainer_motor_total_mass,
+    inertia = [21.47, 21.47, 0.042], # PLACEHOLDER
+    mass = 11.1 + sustainer_motor_total_mass,
     radius = booster_radius
 
 )
 
 sustainer = Rocket(
-    center_of_mass_without_motor = sustainer_length - 1.24,
+    center_of_mass_without_motor = sustainer_length - 1.39,
     coordinate_system_orientation = "tail_to_nose",
     power_off_drag = sustainer_drag,
     power_on_drag = sustainer_drag,
-    inertia = [1.75, 1.75, 0.01], # PLACEHOLDER
-    mass = 5.61,
+    inertia = [4.37, 4.37, 0.018], 
+    mass = 6.25,
     radius = sustainer_radius
 )
 
@@ -386,11 +389,30 @@ booster.add_motor(booster_motor, position = 0)
 sustainer.add_motor(sustainer_motor, position = 0)
 
 booster.add_parachute(
-    name = "Booster Chute",
-    cd_s = 0.8 * 3.1415926 * ((.914/2)**2),
+    name = "Booster Main",
+    cd_s = cds_calc_circle(1.22),
     trigger = "apogee",
     sampling_rate = 1,
-    lag = 5
+    )
+
+booster.add_parachute(
+    name = "Booster Drogue",
+    cd_s = cds_calc_circle(.914),
+    trigger = "apogee",
+    sampling_rate = 1,
+    )
+sustainer.add_parachute(
+    name = "Sustainer Main", 
+    cd_s = cds_calc_circle(1.22),
+    trigger = 200,
+    sampling_rate = 1,
+    )
+
+sustainer.add_parachute(
+    name = "Sustainer Drogue", 
+    cd_s = cds_calc_circle(.914),
+    trigger = "apogee",
+    sampling_rate = 1
     )
 
 booster.add_trapezoidal_fins(
@@ -398,7 +420,7 @@ booster.add_trapezoidal_fins(
     name = "Booster Fins",
     n = 4,
     root_chord = 0.15,
-    span = 0.11,
+    span = 0.12,
     sweep_length = 0.03,
     tip_chord = 0.14,
     position = .2
@@ -418,27 +440,14 @@ sustainer_fins = TrapezoidalFins(
 nose = NoseCone (
     base_radius  = sustainer_radius,
     rocket_radius = sustainer_radius,
-    kind  =  "ogive",
+    kind  =  "von karman",
     length  = nose_length,
-    name  =  "Nose Cone Two",
+    name  =  "Nose Cone",
 )
 
-booster.add_surfaces([boattail, nose, sustainer_fins], [0, total_length, total_length - 2.09])
+booster.add_surfaces([boattail, nose, sustainer_fins], [0, total_length, total_length - (sustainer_length - (.05+0.16))])
 
-sustainer.add_parachute(
-    name = "Sustainer Main", 
-    cd_s = 0.8 * 3.1415926 * ((1.22/2)**2),
-    trigger = 200,
-    sampling_rate = 1,
-    lag = 0
-    )
 
-sustainer.add_parachute(
-    name = "drogue", 
-    cd_s = 0.8 * 3.1415926 * ((.914/2)**2),
-    trigger = "apogee",
-    sampling_rate = 1
-    )
 
 sustainer.add_surfaces([nose, sustainer_fins], [sustainer_length, (.05+0.16)])
 
@@ -477,12 +486,12 @@ drift = math.sqrt(math.pow(x, 2) + math.pow(y, 2))
 
 #drag_sep()
 prints()
-plot_traj()
-draw()
+#plot_traj()
+#draw()
 #plot_all()
 
 # Print Seperated Plots
 
+#kinematics_plots()
 #aerodynamics_plots()
 #fluid_mechanics_plots()
-#kinematics_plots()
