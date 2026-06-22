@@ -11,7 +11,7 @@ booster_thrust = curves_dir + "cerberus-booster-thrust.rse"
 booster_drag = curves_dir + "cerberus-booster-drag.csv"
 
 booster_burnout = 1.7
-sustainer_delay = 2
+sustainer_delay = 1
 
 sustainer_radius = 0.096/2
 booster_radius = 0.113/2

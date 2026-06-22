@@ -4,6 +4,7 @@ from rocketpy import Environment, SolidMotor, Rocket, Flight, Parachute, NoseCon
 
 import datetime, math, matplotlib.pyplot as plt, rocketpy.tools as tls
 
+drift = []
 curves_dir = "C:\\Users\\Owner\\Desktop\\Rockets\\Rocketry Repo\\Orpheus\\curves\\"
 sustainer_thrust = curves_dir + "orpheus-sustainer-thrust.eng"
 sustainer_drag = curves_dir + "orpheus-sustainer-drag.csv"
@@ -41,11 +42,23 @@ sustainer_xy_inertia = (1/12 * sustainer_motor_dry_mass * (3 * (sustainer_motor_
 sustainer_tensor = [sustainer_xy_inertia, sustainer_xy_inertia, (.5 * sustainer_motor_dry_mass * sustainer_motor_or)]
 
 varDate = datetime.datetime(2026, 10, 1, hour = 12)
+wind_speed_xy = []
 
 env =  Environment(latitude = 39.4580, longitude = -8.2906, date = varDate)
 #env.set_atmospheric_model(type = "Windy", file = "ICON") 
 
-env.set_atmospheric_model(type="custom_atmosphere", pressure=None, temperature=300, wind_u=[ (0, 5), (1000, 5) ], wind_v=[ (15, 0), (1000, 0) ], )
+env.set_atmospheric_model(type="custom_atmosphere", pressure=None, temperature=300, wind_u=[ (0, 10), (1000, 10) ], wind_v=[ (15, 0), (1000, 0) ], )
+
+def drift_calc():
+    flights = [booster_flight, sustainer_flight]
+
+    for flt in flights:
+        solution = flt.get_solution_at_time(200, 50)
+        x = float(solution[1])
+        y = float(solution[2])
+        drift_dummy = math.sqrt(math.pow(x, 2) + math.pow(y, 2))
+        drift.append(drift_dummy)
+    return drift
 
 def kinematics(self, *, filename=None):  # pylint: disable=too-many-statements
     """Prints out all Kinematics graphs available about the Flight
@@ -285,8 +298,9 @@ def prints():
     booster_flight.prints.all()
     print("Stage Two \n")
     sustainer_flight.prints.all()
-
-    print("Drift Distance: ", drift)
+ 
+    drift_calc()
+    print("\n Sustainer Drift Distance: ", drift[0], "\n Booster Drift Distance: ", drift[1])
 
     print("\nAtmospheric Model")
     env.prints.atmospheric_conditions()
@@ -476,11 +490,6 @@ sustainer_flight = Flight(
     initial_solution = booster_flight.get_solution_at_time(booster_burnout),
     verbose = True
 )
-
-solution = sustainer_flight.get_solution_at_time(200, 50)
-x = float(solution[1])
-y = float(solution[2])
-drift = math.sqrt(math.pow(x, 2) + math.pow(y, 2))
 
 # Print flight conditions 
 
